@@ -45,9 +45,11 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
+  onAuthStateChanged,
   db,
   collection,
   doc,
+  getDoc,
   setDoc,
   deleteDoc,
   onSnapshot
@@ -232,24 +234,110 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : initialCertificateRequests;
   });
 
-  // Active User session
+  // Active User session - Default to null when unauthenticated
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => {
     const saved = localStorage.getItem('co_currentUser');
-    if (saved) return JSON.parse(saved);
-    const student = initialStudents[0];
-    return {
-      role: 'student',
-      userId: student.userId,
-      name: `${student.firstName} ${student.lastName}`,
-      email: student.emailId,
-      profilePic: student.profilePic || '/Abhi Gaundani.jpeg',
-      courseCode: student.courseCode,
-      semOrYear: student.semOrYear,
-      studentData: student
-    };
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   });
 
   const [currentView, setCurrentView] = useState<string>('dashboard');
+
+  // Firebase Auth State Listener
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        const email = fbUser.email || '';
+        const name = fbUser.displayName || 'Google Campus User';
+        const photoURL = fbUser.photoURL || undefined;
+
+        // Auto-detect role from email and registered rosters
+        const matchedStudent = students.find(s => s.emailId.toLowerCase() === email.toLowerCase());
+        const matchedFaculty = faculties.find(f => f.emailId.toLowerCase() === email.toLowerCase());
+
+        let detectedRole: UserRole = 'student';
+        if (
+          email.toLowerCase().includes('admin') ||
+          email.toLowerCase().includes('director') ||
+          email.toLowerCase() === 'abilash6967@gmail.com' ||
+          email.toLowerCase() === adminProfile.emailId.toLowerCase()
+        ) {
+          detectedRole = 'admin';
+        } else if (matchedFaculty || email.toLowerCase().includes('faculty') || email.toLowerCase().includes('staff')) {
+          detectedRole = 'faculty';
+        } else {
+          detectedRole = 'student';
+        }
+
+        // Check if role was persisted in Firestore users collection
+        try {
+          const userDocSnap = await getDoc(doc(db, 'users', fbUser.uid));
+          if (userDocSnap.exists()) {
+            const data = userDocSnap.data();
+            if (data.role) detectedRole = data.role as UserRole;
+          } else {
+            await setDoc(doc(db, 'users', fbUser.uid), {
+              uid: fbUser.uid,
+              name,
+              email,
+              photoURL: photoURL || '',
+              role: detectedRole,
+              createdAt: new Date().toISOString(),
+              lastLogin: new Date().toISOString()
+            });
+          }
+        } catch (e) {
+          console.warn('Firestore user doc sync note:', e);
+        }
+
+        if (detectedRole === 'admin') {
+          const user: CurrentUser = {
+            role: 'admin',
+            userId: fbUser.uid,
+            name: name,
+            email: email,
+            profilePic: photoURL || '/Admin.png',
+            adminData: adminProfile
+          };
+          setCurrentUser(user);
+        } else if (detectedRole === 'faculty') {
+          const f = matchedFaculty || faculties[0];
+          const user: CurrentUser = {
+            role: 'faculty',
+            userId: fbUser.uid,
+            name: f?.facultyName || name,
+            email: email,
+            profilePic: photoURL || f?.profilePic || '/Ajay Parmar.png',
+            courseCode: f?.courseCode || 'IT',
+            semOrYear: f?.semOrYear || 1,
+            facultyData: f
+          };
+          setCurrentUser(user);
+        } else {
+          const s = matchedStudent || students[0];
+          const user: CurrentUser = {
+            role: 'student',
+            userId: fbUser.uid,
+            name: s ? `${s.firstName} ${s.lastName}` : name,
+            email: email,
+            profilePic: photoURL || s?.profilePic || '/Abhi Gaundani.jpeg',
+            courseCode: s?.courseCode || 'IT',
+            semOrYear: s?.semOrYear || 1,
+            studentData: s
+          };
+          setCurrentUser(user);
+        }
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, [students, faculties, adminProfile]);
 
   // Sync to local storage
   useEffect(() => { localStorage.setItem('co_adminProfile', JSON.stringify(adminProfile)); }, [adminProfile]);
@@ -650,19 +738,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } catch (err: any) {
       console.warn('Google Sign-In note:', err);
-      // Seamless demo fallback if popup is closed or restricted in iframe
-      const user: CurrentUser = {
-        role: 'student',
-        userId: 'ST-1001',
-        name: 'Abhi Gaundani (Demo Student)',
-        email: 'abhi.g@gecbhv.edu.in',
-        profilePic: '/Abhi Gaundani.jpeg',
-        courseCode: 'IT',
-        semOrYear: 1,
-        studentData: students[0]
-      };
-      setCurrentUser(user);
-      return { success: true, message: 'Signed in successfully with Google Demo Session' };
+      if (err?.code === 'auth/popup-closed-by-user') {
+        return { success: false, message: 'Google Sign-In was cancelled or popup closed. Please try again.' };
+      }
+      return { success: false, message: err?.message || 'Google authentication failed. Please try again.' };
     }
   };
 

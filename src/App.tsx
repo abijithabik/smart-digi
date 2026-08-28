@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from './context/AppContext';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
-import { RoleSwitcherModal } from './components/auth/RoleSwitcherModal';
 import { LoginModal } from './components/auth/LoginModal';
+import { PublicLandingView } from './components/views/PublicLandingView';
 
 // Views
 import { DashboardView } from './components/views/DashboardView';
@@ -22,12 +22,27 @@ import { ODLeaveView } from './components/views/ODLeaveView';
 import { EventsView } from './components/views/EventsView';
 import { FreeSlotsView } from './components/views/FreeSlotsView';
 import { ServicesView } from './components/views/ServicesView';
-import { LogIn, Sparkles, GraduationCap, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const { currentView, currentUser, quickLogin } = useApp();
-  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+  const { currentView, currentUser, setCurrentView } = useApp();
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Role-Based Access Control: ensure unauthorized views cannot be accessed
+  useEffect(() => {
+    if (!currentUser) return;
+
+    if (currentUser.role === 'student') {
+      const forbiddenForStudents = ['admin-profile', 'login-history', 'courses', 'subjects', 'faculties'];
+      if (forbiddenForStudents.includes(currentView)) {
+        setCurrentView('dashboard');
+      }
+    } else if (currentUser.role === 'faculty') {
+      const forbiddenForFaculty = ['admin-profile', 'login-history'];
+      if (forbiddenForFaculty.includes(currentView)) {
+        setCurrentView('dashboard');
+      }
+    }
+  }, [currentUser, currentView, setCurrentView]);
 
   const renderView = () => {
     switch (currentView) {
@@ -42,11 +57,11 @@ export const App: React.FC = () => {
       case 'services':
         return <ServicesView />;
       case 'courses':
-        return <CoursesView />;
+        return currentUser?.role === 'admin' ? <CoursesView /> : <DashboardView />;
       case 'subjects':
-        return <SubjectsView />;
+        return currentUser?.role === 'admin' ? <SubjectsView /> : <DashboardView />;
       case 'faculties':
-        return <FacultiesView />;
+        return currentUser?.role === 'admin' || currentUser?.role === 'faculty' ? <FacultiesView /> : <DashboardView />;
       case 'students':
         return <StudentsView />;
       case 'attendance':
@@ -60,9 +75,9 @@ export const App: React.FC = () => {
       case 'chat':
         return <ChatView />;
       case 'admin-profile':
-        return <AdminProfileView />;
+        return currentUser?.role === 'admin' ? <AdminProfileView /> : <DashboardView />;
       case 'login-history':
-        return <LoginHistoryView />;
+        return currentUser?.role === 'admin' ? <LoginHistoryView /> : <DashboardView />;
       default:
         return <DashboardView />;
     }
@@ -71,62 +86,25 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Global Header */}
-      <Header
-        onOpenQuickSwitch={() => setShowRoleSwitcher(true)}
-        onOpenLoginModal={() => setShowLoginModal(true)}
-      />
+      <Header onOpenLoginModal={() => setShowLoginModal(true)} />
 
-      {/* Main Layout Container */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Content Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden min-w-0">
-          {!currentUser ? (
-            <div className="p-8 sm:p-12 text-center bg-slate-900 border border-slate-800 rounded-3xl max-w-xl mx-auto my-12 shadow-2xl space-y-5">
-              <div className="w-16 h-16 rounded-3xl bg-blue-600 flex items-center justify-center text-white mx-auto shadow-xl shadow-blue-600/30 font-black">
-                <GraduationCap className="w-10 h-10" />
-              </div>
-
-              <div>
-                <h2 className="text-2xl font-extrabold text-white tracking-tight">
-                  Welcome to CampusOne AI
-                </h2>
-                <p className="text-xs text-slate-400 mt-2 max-w-md mx-auto">
-                  One Campus. One Platform. Smarter Student Services. Sign in with your Google account or institute credentials to access attendance, OD passes, marks, and notifications.
-                </p>
-              </div>
-
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <button
-                  onClick={() => setShowLoginModal(true)}
-                  className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>Sign In with Firebase</span>
-                </button>
-
-                <button
-                  onClick={() => quickLogin('student')}
-                  className="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2"
-                >
-                  <span>Quick Demo Session</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            renderView()
-          )}
-        </main>
-      </div>
-
-      {/* Modals */}
-      {showRoleSwitcher && (
-        <RoleSwitcherModal onClose={() => setShowRoleSwitcher(false)} />
+      {/* Main Layout */}
+      {!currentUser ? (
+        // Public Website / Landing Page (Strictly shown when unauthenticated)
+        <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <PublicLandingView onOpenLoginModal={() => setShowLoginModal(true)} />
+        </div>
+      ) : (
+        // Authenticated Dashboard Layout with Protected Sidebar and Views
+        <div className="flex-1 flex max-w-7xl w-full mx-auto">
+          <Sidebar />
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden min-w-0">
+            {renderView()}
+          </main>
+        </div>
       )}
 
+      {/* Google Authentication Modal */}
       {showLoginModal && (
         <LoginModal onClose={() => setShowLoginModal(false)} />
       )}

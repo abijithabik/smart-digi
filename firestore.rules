@@ -7,99 +7,95 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Admin Profile & System Settings
+    // Authenticated users collection
+    match /users/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Admin Profile & System Settings (Public read for institutional branding, auth write)
     match /adminProfile/{docId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAuthenticated();
     }
 
-    // Courses & Curriculum
+    // Courses & Curriculum (Public read, auth write)
     match /courses/{courseId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAuthenticated();
     }
 
-    // Subjects
+    // Subjects (Public read, auth write)
     match /subjects/{subjectId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAuthenticated();
     }
 
-    // Faculty members
+    // Faculty directory
     match /faculties/{facultyId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAuthenticated();
     }
 
-    // Students
+    // Students roster
     match /students/{studentId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
-    // Attendance
+    // Attendance records
     match /attendance/{recordId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
     // Marks and Exam Results
     match /marks/{markId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
     // OD & Leave Requests
     match /odRequests/{requestId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
-    // Events & Hackathons
+    // Events & Hackathons (Public read, auth write)
     match /events/{eventId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAuthenticated();
     }
 
     // Free Slots & Campus Rooms
     match /slots/{slotId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
     // Service Requests / Grievances
     match /serviceRequests/{serviceId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
     // Certificate Requests
     match /certificates/{certId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
-    // Circulars and Notifications
+    // Circulars and Notifications (Public read for broad awareness, auth write)
     match /notifications/{notifId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAuthenticated();
     }
 
     // Real-time Chat Messages
     match /messages/{messageId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
     // Audit Login History
     match /loginHistory/{historyId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if isAuthenticated();
     }
 
-    // Default rule for other documents
+    // Default rule for unspecified paths
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if isAuthenticated();
     }
   }
 }

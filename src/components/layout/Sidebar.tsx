@@ -59,9 +59,9 @@ export const Sidebar: React.FC = () => {
     {
       title: 'Academic Intelligence',
       items: [
-        { id: 'courses', label: 'Courses & Wings', icon: BookOpen, roles: ['admin', 'faculty', 'student'] },
-        { id: 'subjects', label: 'Curriculum Subjects', icon: FileText, roles: ['admin', 'faculty', 'student'] },
-        { id: 'faculties', label: 'Faculty Directory', icon: Users, roles: ['admin', 'faculty', 'student'] },
+        { id: 'courses', label: 'Courses & Wings', icon: BookOpen, roles: ['admin'] },
+        { id: 'subjects', label: 'Curriculum Subjects', icon: FileText, roles: ['admin'] },
+        { id: 'faculties', label: 'Faculty Directory', icon: Users, roles: ['admin', 'faculty'] },
         { id: 'students', label: 'Student Roster', icon: GraduationCap, roles: ['admin', 'faculty', 'student'] },
         { id: 'attendance', label: 'Attendance & Support', icon: CalendarCheck, roles: ['admin', 'faculty', 'student'] },
         { id: 'marks', label: 'Marks Entry Desk', icon: Award, roles: ['admin', 'faculty'] },
