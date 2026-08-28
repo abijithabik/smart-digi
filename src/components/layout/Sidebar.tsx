@@ -16,14 +16,13 @@ import {
   FileCheck,
   Trophy,
   Building2,
-  Wrench,
-  ShieldAlert
+  Wrench
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { currentView, setCurrentView, currentUser, notifications, odRequests, serviceRequests } = useApp();
 
-  const role = currentUser?.role || 'admin';
+  const role = currentUser?.role || 'student';
 
   const unreadNotifs = notifications.filter(
     n => currentUser && !n.readBy.includes(currentUser.userId) && (n.userProfile === 'All' || n.userProfile.toLowerCase() === currentUser.role)
@@ -44,7 +43,7 @@ export const Sidebar: React.FC = () => {
       title: 'Main Hub',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'faculty', 'student'] },
-        { id: 'notifications', label: 'Notice Board', icon: Bell, roles: ['admin', 'faculty', 'student'], badge: unreadNotifs },
+        { id: 'notifications', label: 'Notice Board & Alerts', icon: Bell, roles: ['admin', 'faculty', 'student'], badge: unreadNotifs },
         { id: 'chat', label: 'Campus Connect Chat', icon: MessageSquare, roles: ['admin', 'faculty', 'student'] },
       ]
     },
@@ -58,22 +57,22 @@ export const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'Academic Management',
+      title: 'Academic Intelligence',
       items: [
         { id: 'courses', label: 'Courses & Wings', icon: BookOpen, roles: ['admin', 'faculty', 'student'] },
         { id: 'subjects', label: 'Curriculum Subjects', icon: FileText, roles: ['admin', 'faculty', 'student'] },
         { id: 'faculties', label: 'Faculty Directory', icon: Users, roles: ['admin', 'faculty', 'student'] },
         { id: 'students', label: 'Student Roster', icon: GraduationCap, roles: ['admin', 'faculty', 'student'] },
-        { id: 'attendance', label: 'Attendance Logs', icon: CalendarCheck, roles: ['admin', 'faculty', 'student'] },
+        { id: 'attendance', label: 'Attendance & Support', icon: CalendarCheck, roles: ['admin', 'faculty', 'student'] },
         { id: 'marks', label: 'Marks Entry Desk', icon: Award, roles: ['admin', 'faculty'] },
-        { id: 'results', label: 'Performance & Report', icon: Award, roles: ['admin', 'faculty', 'student'] },
+        { id: 'results', label: 'Performance & Marksheet', icon: Award, roles: ['admin', 'faculty', 'student'] },
       ]
     },
     {
       title: 'System & Security',
       items: [
         { id: 'login-history', label: 'Audit Log & History', icon: History, roles: ['admin'] },
-        { id: 'admin-profile', label: 'Campus Organization', icon: Settings, roles: ['admin'] },
+        { id: 'admin-profile', label: 'Campus Settings', icon: Settings, roles: ['admin'] },
       ]
     }
   ];
@@ -82,15 +81,15 @@ export const Sidebar: React.FC = () => {
     <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 min-h-[calc(100vh-4rem)]">
       {/* Role Banner */}
       <div className="p-4 border-b border-slate-800">
-        <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold shrink-0">
+        <div className="bg-slate-800/80 rounded-2xl p-3 border border-slate-700/60 flex items-center gap-3 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 font-extrabold shrink-0">
             {role === 'admin' ? 'DIR' : role === 'faculty' ? 'FAC' : 'STU'}
           </div>
           <div className="overflow-hidden">
-            <div className="text-xs font-semibold text-white truncate">
+            <div className="text-xs font-bold text-white truncate">
               {currentUser?.name || 'Guest User'}
             </div>
-            <div className="text-[11px] text-amber-400 capitalize flex items-center gap-1 font-medium">
+            <div className="text-[11px] text-blue-400 capitalize flex items-center gap-1 font-semibold">
               <Sparkles className="w-3 h-3" />
               <span>{role === 'admin' ? 'Director / Admin' : role === 'faculty' ? 'Faculty Staff' : 'Student Portal'}</span>
             </div>
@@ -116,20 +115,20 @@ export const Sidebar: React.FC = () => {
                   <button
                     key={item.id}
                     onClick={() => setCurrentView(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                       isActive
-                        ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20 font-bold'
                         : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-slate-950' : 'text-slate-400'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                       <span>{item.label}</span>
                     </div>
                     {item.badge !== undefined && item.badge > 0 && (
                       <span
-                        className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                          isActive ? 'bg-slate-950 text-amber-400' : 'bg-amber-500 text-slate-950'
+                        className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
+                          isActive ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
                         }`}
                       >
                         {item.badge}
@@ -144,8 +143,8 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer Info */}
-      <div className="p-3 border-t border-slate-800 text-[10px] text-slate-500 text-center">
-        CampusOne Integrated Ecosystem v2.5
+      <div className="p-3.5 border-t border-slate-800 text-[10px] text-slate-500 text-center font-medium">
+        CampusOne AI Integrated Platform
       </div>
     </aside>
   );

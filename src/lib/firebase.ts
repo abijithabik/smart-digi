@@ -15,7 +15,7 @@ import {
   limit,
   enableIndexedDbPersistence
 } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, User } from 'firebase/auth';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
 const firebaseConfig = {
@@ -37,11 +37,15 @@ export const db = firebaseConfigData.firestoreDatabaseId && firebaseConfigData.f
 
 // Initialize Firebase Auth
 export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
 
-// Auto authenticate anonymously if not signed in for seamless persistence & security rules
-signInAnonymously(auth).catch((err) => {
-  console.warn('Anonymous auth note (safe to proceed):', err);
-});
+export {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+};
 
 export {
   collection,
