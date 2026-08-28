@@ -148,106 +148,45 @@ interface AppContextType {
   updateCertificateStatus: (id: string, status: CertificateStatus) => void;
 }
 
+const safeParseStorage = <T,>(key: string, fallback: T): T => {
+  try {
+    const saved = localStorage.getItem(key);
+    if (!saved) return fallback;
+    return JSON.parse(saved) as T;
+  } catch (err) {
+    console.warn(`Error parsing localStorage key "${key}":`, err);
+    return fallback;
+  }
+};
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [firebaseStatus, setFirebaseStatus] = useState<'connected' | 'syncing' | 'offline'>('syncing');
   const isInitialCloudSyncDone = useRef(false);
 
-  const [adminProfile, setAdminProfile] = useState<AdminProfile>(() => {
-    const saved = localStorage.getItem('co_adminProfile');
-    return saved ? JSON.parse(saved) : initialAdminProfile;
-  });
-
-  const [courses, setCourses] = useState<Course[]>(() => {
-    const saved = localStorage.getItem('co_courses');
-    return saved ? JSON.parse(saved) : initialCourses;
-  });
-
-  const [subjects, setSubjects] = useState<Subject[]>(() => {
-    const saved = localStorage.getItem('co_subjects');
-    return saved ? JSON.parse(saved) : initialSubjects;
-  });
-
-  const [faculties, setFaculties] = useState<Faculty[]>(() => {
-    const saved = localStorage.getItem('co_faculties');
-    return saved ? JSON.parse(saved) : initialFaculties;
-  });
-
-  const [students, setStudents] = useState<Student[]>(() => {
-    const saved = localStorage.getItem('co_students');
-    return saved ? JSON.parse(saved) : initialStudents;
-  });
-
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => {
-    const saved = localStorage.getItem('co_attendance');
-    return saved ? JSON.parse(saved) : initialAttendance;
-  });
-
-  const [marks, setMarks] = useState<MarksRecord[]>(() => {
-    const saved = localStorage.getItem('co_marks');
-    return saved ? JSON.parse(saved) : initialMarks;
-  });
-
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    const saved = localStorage.getItem('co_notifications');
-    return saved ? JSON.parse(saved) : initialNotifications;
-  });
-
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
-    const saved = localStorage.getItem('co_chatMessages');
-    return saved ? JSON.parse(saved) : initialChatMessages;
-  });
-
-  const [loginHistory, setLoginHistory] = useState<UserLoginHistory[]>(() => {
-    const saved = localStorage.getItem('co_loginHistory');
-    return saved ? JSON.parse(saved) : initialLoginHistory;
-  });
-
-  const [declaredResults, setDeclaredResults] = useState<Record<string, boolean>>(() => {
-    const saved = localStorage.getItem('co_declaredResults');
-    return saved ? JSON.parse(saved) : { 'IT_1': true, 'CE_1': false };
-  });
-
-  const [odRequests, setOdRequests] = useState<ODRequest[]>(() => {
-    const saved = localStorage.getItem('co_odRequests');
-    return saved ? JSON.parse(saved) : initialODRequests;
-  });
-
-  const [campusEvents, setCampusEvents] = useState<CampusEvent[]>(() => {
-    const saved = localStorage.getItem('co_campusEvents');
-    return saved ? JSON.parse(saved) : initialCampusEvents;
-  });
-
-  const [campusSlots, setCampusSlots] = useState<CampusSlot[]>(() => {
-    const saved = localStorage.getItem('co_campusSlots');
-    return saved ? JSON.parse(saved) : initialCampusSlots;
-  });
-
-  const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>(() => {
-    const saved = localStorage.getItem('co_serviceRequests');
-    return saved ? JSON.parse(saved) : initialServiceRequests;
-  });
-
-  const [certificateRequests, setCertificateRequests] = useState<CertificateRequest[]>(() => {
-    const saved = localStorage.getItem('co_certificateRequests');
-    return saved ? JSON.parse(saved) : initialCertificateRequests;
-  });
+  const [adminProfile, setAdminProfile] = useState<AdminProfile>(() => safeParseStorage('co_adminProfile', initialAdminProfile));
+  const [courses, setCourses] = useState<Course[]>(() => safeParseStorage('co_courses', initialCourses));
+  const [subjects, setSubjects] = useState<Subject[]>(() => safeParseStorage('co_subjects', initialSubjects));
+  const [faculties, setFaculties] = useState<Faculty[]>(() => safeParseStorage('co_faculties', initialFaculties));
+  const [students, setStudents] = useState<Student[]>(() => safeParseStorage('co_students', initialStudents));
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeParseStorage('co_attendance', initialAttendance));
+  const [marks, setMarks] = useState<MarksRecord[]>(() => safeParseStorage('co_marks', initialMarks));
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => safeParseStorage('co_notifications', initialNotifications));
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => safeParseStorage('co_chatMessages', initialChatMessages));
+  const [loginHistory, setLoginHistory] = useState<UserLoginHistory[]>(() => safeParseStorage('co_loginHistory', initialLoginHistory));
+  const [declaredResults, setDeclaredResults] = useState<Record<string, boolean>>(() => safeParseStorage('co_declaredResults', { 'IT_1': true, 'CE_1': false }));
+  const [odRequests, setOdRequests] = useState<ODRequest[]>(() => safeParseStorage('co_odRequests', initialODRequests));
+  const [campusEvents, setCampusEvents] = useState<CampusEvent[]>(() => safeParseStorage('co_campusEvents', initialCampusEvents));
+  const [campusSlots, setCampusSlots] = useState<CampusSlot[]>(() => safeParseStorage('co_campusSlots', initialCampusSlots));
+  const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>(() => safeParseStorage('co_serviceRequests', initialServiceRequests));
+  const [certificateRequests, setCertificateRequests] = useState<CertificateRequest[]>(() => safeParseStorage('co_certificateRequests', initialCertificateRequests));
 
   // Active User session - Default to null when unauthenticated
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => {
-    const saved = localStorage.getItem('co_currentUser');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  });
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(() => safeParseStorage<CurrentUser | null>('co_currentUser', null));
 
   const [currentView, setCurrentView] = useState<string>('dashboard');
+  const isAuthenticatingRef = useRef(false);
 
   // Firebase Auth State Listener
   useEffect(() => {
@@ -668,6 +607,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // 2. Google Authentication with Role Auto-Detection
   const signInWithGoogleAuth = async (): Promise<{ success: boolean; message: string }> => {
+    if (isAuthenticatingRef.current) {
+      return { success: false, message: 'Google authentication is currently in progress...' };
+    }
+    isAuthenticatingRef.current = true;
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const fbUser = result.user;
@@ -696,14 +639,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (detectedRole === 'admin') {
         const user: CurrentUser = {
           role: 'admin',
-          userId: 'admin_google',
+          userId: fbUser.uid || 'admin_google',
           name: name,
           email: email,
           profilePic: photoURL || '/Admin.png',
           adminData: adminProfile
         };
         setCurrentUser(user);
-        addLoginRecord('admin_google', name, 'Admin');
+        addLoginRecord(user.userId, name, 'Admin');
         return { success: true, message: `Signed in as Director / Admin (${name})` };
       } else if (detectedRole === 'faculty') {
         const f = matchedFaculty || faculties[0];
@@ -738,10 +681,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } catch (err: any) {
       console.warn('Google Sign-In note:', err);
-      if (err?.code === 'auth/popup-closed-by-user') {
-        return { success: false, message: 'Google Sign-In was cancelled or popup closed. Please try again.' };
+      const errMsg = String(err?.message || err || '');
+      if (
+        err?.code === 'auth/popup-closed-by-user' ||
+        err?.code === 'auth/cancelled-popup-request' ||
+        errMsg.includes('INTERNAL ASSERTION FAILED') ||
+        errMsg.includes('Pending promise was never set') ||
+        errMsg.includes('popup-closed-by-user')
+      ) {
+        return { success: false, message: 'Google Sign-In popup was closed or cancelled. Please try again.' };
+      }
+      if (err?.code === 'auth/popup-blocked') {
+        return { success: false, message: 'Pop-up was blocked by your browser. Please allow pop-ups for this site and try again.' };
       }
       return { success: false, message: err?.message || 'Google authentication failed. Please try again.' };
+    } finally {
+      isAuthenticatingRef.current = false;
     }
   };
 

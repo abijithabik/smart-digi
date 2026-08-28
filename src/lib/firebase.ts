@@ -38,6 +38,9 @@ export const db = firebaseConfigData.firestoreDatabaseId && firebaseConfigData.f
 // Initialize Firebase Auth
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 export {
   signInWithEmailAndPassword,

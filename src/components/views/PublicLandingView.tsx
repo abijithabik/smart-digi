@@ -45,7 +45,7 @@ export const PublicLandingView: React.FC<{ onOpenLoginModal: () => void }> = ({ 
           {/* Primary Action Button: Continue with Google */}
           <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             <button
-              onClick={() => signInWithGoogleAuth()}
+              onClick={() => onOpenLoginModal()}
               className="px-8 py-4 bg-white hover:bg-slate-100 active:scale-[0.99] text-slate-900 font-extrabold text-sm rounded-2xl shadow-2xl transition-all flex items-center justify-center gap-3 border border-slate-200 cursor-pointer group"
             >
               <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -196,7 +196,7 @@ export const PublicLandingView: React.FC<{ onOpenLoginModal: () => void }> = ({ 
 
         <div className="pt-2">
           <button
-            onClick={() => signInWithGoogleAuth()}
+            onClick={() => onOpenLoginModal()}
             className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 mx-auto border border-slate-200 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
