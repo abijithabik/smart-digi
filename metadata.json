@@ -1,0 +1,8 @@
+{
+  "name": "CampusOne AI",
+  "description": "CampusOne AI: One Campus. One Platform. Smarter Student Services. Intelligent campus platform for Students, Faculty, and Directors with AI insights, OD workflows, timetable free slots, and smart academics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

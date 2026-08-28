@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Admin Profile & System Settings
+    match /adminProfile/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Courses & Curriculum
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Subjects
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Faculty members
+    match /faculties/{facultyId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Students
+    match /students/{studentId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Attendance
+    match /attendance/{recordId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Marks and Exam Results
+    match /marks/{markId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // OD & Leave Requests
+    match /odRequests/{requestId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Events & Hackathons
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Free Slots & Campus Rooms
+    match /slots/{slotId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Service Requests / Grievances
+    match /serviceRequests/{serviceId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Certificate Requests
+    match /certificates/{certId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Circulars and Notifications
+    match /notifications/{notifId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Real-time Chat Messages
+    match /messages/{messageId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Audit Login History
+    match /loginHistory/{historyId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Default rule for other documents
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

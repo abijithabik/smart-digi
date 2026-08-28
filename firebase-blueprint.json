@@ -1,0 +1,168 @@
+{
+  "entities": {
+    "AdminProfile": {
+      "collection": "adminProfile",
+      "fields": {
+        "collegeName": { "type": "string", "required": true },
+        "collegeLogo": { "type": "string" },
+        "address": { "type": "string" },
+        "contactNumber": { "type": "string" },
+        "emailId": { "type": "string" },
+        "website": { "type": "string" },
+        "establishedYear": { "type": "string" },
+        "principalName": { "type": "string" },
+        "affiliation": { "type": "string" }
+      }
+    },
+    "Course": {
+      "collection": "courses",
+      "fields": {
+        "courseCode": { "type": "string", "required": true },
+        "courseName": { "type": "string", "required": true },
+        "semOrYear": { "type": "string", "required": true },
+        "totalSemOrYear": { "type": "number", "required": true }
+      }
+    },
+    "Subject": {
+      "collection": "subjects",
+      "fields": {
+        "subjectCode": { "type": "string", "required": true },
+        "subjectName": { "type": "string", "required": true },
+        "courseCode": { "type": "string", "required": true },
+        "semOrYear": { "type": "number", "required": true },
+        "subjectType": { "type": "string", "required": true },
+        "theoryMarks": { "type": "number" },
+        "practicalMarks": { "type": "number" }
+      }
+    },
+    "Faculty": {
+      "collection": "faculties",
+      "fields": {
+        "facultyId": { "type": "number", "required": true },
+        "facultyName": { "type": "string", "required": true },
+        "emailId": { "type": "string", "required": true },
+        "contactNumber": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "semOrYear": { "type": "number" },
+        "subject": { "type": "string" },
+        "position": { "type": "string" },
+        "activeStatus": { "type": "boolean" }
+      }
+    },
+    "Student": {
+      "collection": "students",
+      "fields": {
+        "rollNumber": { "type": "number", "required": true },
+        "firstName": { "type": "string", "required": true },
+        "lastName": { "type": "string", "required": true },
+        "courseCode": { "type": "string", "required": true },
+        "semOrYear": { "type": "number", "required": true },
+        "emailId": { "type": "string" },
+        "userId": { "type": "string", "required": true },
+        "activeStatus": { "type": "boolean" }
+      }
+    },
+    "Attendance": {
+      "collection": "attendance",
+      "fields": {
+        "date": { "type": "string", "required": true },
+        "courseCode": { "type": "string", "required": true },
+        "semOrYear": { "type": "number", "required": true },
+        "rollNumber": { "type": "number", "required": true },
+        "present": { "type": "boolean", "required": true }
+      }
+    },
+    "Marks": {
+      "collection": "marks",
+      "fields": {
+        "courseCode": { "type": "string", "required": true },
+        "semOrYear": { "type": "number", "required": true },
+        "rollNumber": { "type": "number", "required": true },
+        "theoryMarks": { "type": "number", "required": true },
+        "practicalMarks": { "type": "number", "required": true }
+      }
+    },
+    "ODRequest": {
+      "collection": "odRequests",
+      "fields": {
+        "requestId": { "type": "string", "required": true },
+        "studentName": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true },
+        "category": { "type": "string", "required": true },
+        "fromDate": { "type": "string", "required": true },
+        "toDate": { "type": "string", "required": true },
+        "totalDays": { "type": "number", "required": true },
+        "status": { "type": "string", "required": true }
+      }
+    },
+    "CampusEvent": {
+      "collection": "events",
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "category": { "type": "string", "required": true },
+        "date": { "type": "string", "required": true },
+        "time": { "type": "string" },
+        "venue": { "type": "string" }
+      }
+    },
+    "CampusSlot": {
+      "collection": "slots",
+      "fields": {
+        "department": { "type": "string", "required": true },
+        "block": { "type": "string", "required": true },
+        "roomNumber": { "type": "string", "required": true },
+        "dayOfWeek": { "type": "string", "required": true },
+        "timeSlot": { "type": "string", "required": true },
+        "isFree": { "type": "boolean", "required": true }
+      }
+    },
+    "ServiceRequest": {
+      "collection": "serviceRequests",
+      "fields": {
+        "ticketId": { "type": "string", "required": true },
+        "studentName": { "type": "string", "required": true },
+        "category": { "type": "string", "required": true },
+        "priority": { "type": "string", "required": true },
+        "status": { "type": "string", "required": true }
+      }
+    },
+    "CertificateRequest": {
+      "collection": "certificates",
+      "fields": {
+        "certNumber": { "type": "string", "required": true },
+        "certificateType": { "type": "string", "required": true },
+        "studentName": { "type": "string", "required": true },
+        "rollNumber": { "type": "number", "required": true },
+        "status": { "type": "string", "required": true }
+      }
+    },
+    "Notification": {
+      "collection": "notifications",
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "message": { "type": "string", "required": true },
+        "userProfile": { "type": "string", "required": true },
+        "time": { "type": "string", "required": true }
+      }
+    },
+    "ChatMessage": {
+      "collection": "messages",
+      "fields": {
+        "fromUserId": { "type": "string", "required": true },
+        "fromUserName": { "type": "string", "required": true },
+        "toUserId": { "type": "string", "required": true },
+        "message": { "type": "string", "required": true },
+        "messageTime": { "type": "string", "required": true }
+      }
+    },
+    "LoginHistory": {
+      "collection": "loginHistory",
+      "fields": {
+        "userId": { "type": "string", "required": true },
+        "userName": { "type": "string", "required": true },
+        "userProfile": { "type": "string", "required": true },
+        "loginTime": { "type": "string", "required": true }
+      }
+    }
+  }
+}
